@@ -7,9 +7,9 @@ from django.contrib.auth.models import User
 class Group(models.Model):
     name = models.CharField(max_length=100)
     admin = models.ForeignKey(User, on_delete=models.CASCADE)
-    amount = models.FloatField()
-    slots = models.IntegerField()
-    isActive = models.BooleanField()
+    amount = models.FloatField(default=0)
+    slots = models.IntegerField(default=0)
+    isActive = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     pass
 
@@ -18,8 +18,8 @@ class UserGroup(models.Model):
     group = models.ForeignKey(Group, related_name='users', on_delete=models.CASCADE)
     user = models.ForeignKey(User, related_name='teams', on_delete=models.CASCADE)
     month = models.CharField(max_length=100)
-    inflow = models.FloatField()
-    outflow = models.FloatField()
+    inflow = models.FloatField(default=0)
+    outflow = models.FloatField(default=0)
     pass
 
 # Contributions

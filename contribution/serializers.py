@@ -7,7 +7,7 @@ class GroupSerializer(serializers.ModelSerializer):
     users = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     class Meta:
         model = Group
-        fields = "__all__"
+        fields = ["name", "amount", "slots", "users", "isActive"]
 
 # User Serializer
 class UserSerializer(serializers.ModelSerializer):
