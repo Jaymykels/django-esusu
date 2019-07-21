@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 class Group(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(max_length=500)
-    admin = models.ForeignKey(User, on_delete=models.CASCADE)
+    admin = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE)
     amount = models.FloatField()
     capacity = models.IntegerField()
     isPublic = models.BooleanField()
@@ -21,12 +21,4 @@ class UserGroup(models.Model):
     slot = models.IntegerField()
     saving = models.FloatField(default=0)
     expense = models.FloatField(default=0)
-    pass
-
-# Contributions
-class Contribution(models.Model):
-    source = models.ForeignKey(UserGroup, related_name='credits', on_delete=models.CASCADE)
-    destination = models.ForeignKey(UserGroup, related_name='debits', on_delete=models.CASCADE)
-    amount = models.FloatField()
-    created_at = models.DateTimeField(auto_now_add=True)
     pass

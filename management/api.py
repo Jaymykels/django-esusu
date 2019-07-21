@@ -1,9 +1,10 @@
-from .models import Group, UserGroup, Contribution
+from .models import Group, UserGroup
 from rest_framework import generics, permissions, status, views
-from .serializers import GroupSerializer, UserGroupSerializer, ContributionSerializer
+from .serializers import GroupSerializer, UserGroupSerializer
 from rest_framework.response import Response
 from django.db.models import Q
 from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404
 
 # Manage Groups
 class GroupApi(generics.ListCreateAPIView):
@@ -42,13 +43,7 @@ class GroupUsersApi(generics.RetrieveAPIView):
 
     # Get users from group id
     def get_queryset(self, pk):
-        try:
-            group = Group.objects.get(pk=pk,admin=self.request.user)
-        except Group.DoesNotExist:
-            content = {
-                'status': 'Not Found'
-            }
-            return Response(content, status=status.HTTP_404_NOT_FOUND)
+        group = get_object_or_404(Group,pk=pk)
         users = UserGroup.objects.filter(group=group)
         return users
 
@@ -64,13 +59,7 @@ class AddGroupUser(generics.RetrieveAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self, pk):
-        try:
-            group = Group.objects.get(pk=pk)
-        except Group.DoesNotExist:
-            content = {
-                'status': 'Not Found'
-            }
-            return Response(content, status=status.HTTP_404_NOT_FOUND)
+        group = get_object_or_404(Group,pk=pk)
         return group
 
     def get(self, request, pk):
