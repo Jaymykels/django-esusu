@@ -1,8 +1,9 @@
 from .models import Group, UserGroup, Contribution
-from rest_framework import generics, permissions, status
+from rest_framework import generics, permissions, status, views
 from .serializers import GroupSerializer, UserGroupSerializer, ContributionSerializer
 from rest_framework.response import Response
 from django.db.models import Q
+from django.contrib.auth.models import User
 
 # Manage Groups
 class GroupApi(generics.ListCreateAPIView):
@@ -34,9 +35,8 @@ class GroupApi(generics.ListCreateAPIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
 # Retrieve Group List of Users
-class UserGroupApi(generics.RetrieveAPIView):
+class GroupUsersApi(generics.RetrieveAPIView):
     serializer_class = UserGroupSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -57,3 +57,31 @@ class UserGroupApi(generics.RetrieveAPIView):
         users = self.get_queryset(pk)
         serializer = self.serializer_class(users, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+# Add user to group
+class AddGroupUser(generics.RetrieveAPIView):
+    serializer_class = UserGroupSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self, pk):
+        try:
+            group = Group.objects.get(pk=pk)
+        except Group.DoesNotExist:
+            content = {
+                'status': 'Not Found'
+            }
+            return Response(content, status=status.HTTP_404_NOT_FOUND)
+        return group
+
+    def get(self, request, pk):
+        group = self.get_queryset(pk)
+        slot = UserGroup.objects.filter(group=group).count() + 1
+        if slot > group.capacity:
+            content = {
+                'status': 'Group is full'
+            }
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
+        group_user = UserGroup(group=group,user=request.user,slot=slot)
+        group_user.save()
+        serializer = self.serializer_class(group_user)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
