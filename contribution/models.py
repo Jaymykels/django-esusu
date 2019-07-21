@@ -6,20 +6,21 @@ from django.contrib.auth.models import User
 # Groups
 class Group(models.Model):
     name = models.CharField(max_length=100)
+    description = models.TextField(max_length=500)
     admin = models.ForeignKey(User, on_delete=models.CASCADE)
-    amount = models.FloatField(default=0)
-    slots = models.IntegerField(default=0)
-    isActive = models.BooleanField(default=True)
+    amount = models.FloatField()
+    capacity = models.IntegerField()
+    isPublic = models.BooleanField()
     created_at = models.DateTimeField(auto_now_add=True)
     pass
 
 # User's Group's
 class UserGroup(models.Model):
     group = models.ForeignKey(Group, related_name='users', on_delete=models.CASCADE)
-    user = models.ForeignKey(User, related_name='teams', on_delete=models.CASCADE)
-    month = models.CharField(max_length=100)
-    inflow = models.FloatField(default=0)
-    outflow = models.FloatField(default=0)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    slot = models.IntegerField()
+    saving = models.FloatField(default=0)
+    expense = models.FloatField(default=0)
     pass
 
 # Contributions
